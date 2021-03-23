@@ -1,0 +1,38 @@
+version: "3.7"
+services:
+  api:
+    build:
+      context: $PROJECT_PATH
+      dockerfile: $PROJECT_PATH/deployment/api/Dockerfile
+    container_name: lucky_api
+    environment:
+      APP_ENV: ${APP_ENV}
+    ports:
+      - "3000:3000"
+    volumes:
+      - $PROJECT_PATH:/go/src/casino:cached
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  db:
+    image: postgres:13.2-alpine
+    container_name: lucky_psql
+    restart: always
+    volumes:
+      - ./psql/initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: db_admin
+      POSTGRES_PASSWORD: admin321
+      POSTGRES_DB: lucky
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U db_admin -d lucky"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

@@ -13,3 +13,13 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# IDE folders
+.idea
+.vscode
+
+# local env files
+*.env
+.env.*
+!.env.dist
+!pkg/config/testdata/*
